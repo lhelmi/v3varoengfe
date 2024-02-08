@@ -3,8 +3,9 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { formatRupiah } from '../utils/format';
 
-const TotalForm = ({total, onBayarChange, kembalianValue}) => {
+const TotalForm = ({total, onBayarChange, kembalianValue, bayarValue}) => {
     return (
         <Card className='mt-3'>
             <Card.Header></Card.Header>
@@ -14,7 +15,7 @@ const TotalForm = ({total, onBayarChange, kembalianValue}) => {
                         <Card.Text>TOTAL</Card.Text>
                     </Col>
                     <Col lg={8}>
-                        <Form.Control className="" disabled readOnly placeholder="" value={total}/>
+                        <Form.Control className="" disabled readOnly placeholder="" value={formatRupiah(total)}/>
                     </Col>  
                 </Row>
                 <Row className='mt-2'>
@@ -22,7 +23,7 @@ const TotalForm = ({total, onBayarChange, kembalianValue}) => {
                         <Card.Text>BAYAR</Card.Text>
                     </Col>
                     <Col lg={8}>
-                        <Form.Control className="" placeholder="" onChange={onBayarChange}/>
+                        <Form.Control className="" placeholder="" onChange={onBayarChange} value={formatRupiah(bayarValue)}/>
                     </Col>
                 </Row>
                 <Row className='mt-2'>
@@ -30,7 +31,7 @@ const TotalForm = ({total, onBayarChange, kembalianValue}) => {
                         <Card.Text>KEMBALIAN</Card.Text>
                     </Col>
                     <Col lg={8}>
-                        <Form.Control className="" placeholder="" value={kembalianValue} disabled/>
+                        <Form.Control className="" placeholder="" value={formatRupiah(kembalianValue)} disabled/>
                     </Col>
                 </Row>
                 <Row lg={10} className='mt-2'>
