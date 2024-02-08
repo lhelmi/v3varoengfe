@@ -78,6 +78,31 @@ const App = () => {
     setCart(temp);
   }
 
+  const cleanHandle = () => {
+    Swal.fire({
+      title: "Apakah Anda Yakin?",
+      text : 'Ingin Menghapus Semua Item!?',
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ya, Hapus!",
+      cancelButtonText: "Tidak"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        let tempCart = cart.slice();
+        tempCart = [];
+        setCart(tempCart);
+        Swal.fire({
+          title: "Terhapus!",
+          timer: 1000,
+          icon: "success"
+        });
+        
+      }
+    });
+  }
+
   const updateTotal = (arr) => {
     const totalPrice = arr.reduce((accumulator ,item) => {
       return accumulator += item.total;
@@ -162,6 +187,7 @@ const App = () => {
             onBayarChange={({target}) => bayarHandle(target.value)}
             kembalianValue={kembalian}
             bayarValue={bayar}
+            onCleanClick={() => cleanHandle()}
           />
         </Col>
       

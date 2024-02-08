@@ -5,7 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { formatRupiah } from '../utils/format';
 
-const TotalForm = ({total, onBayarChange, kembalianValue, bayarValue}) => {
+const TotalForm = ({total, onBayarChange, kembalianValue, bayarValue, onCleanClick}) => {
     return (
         <Card className='mt-3'>
             <Card.Header></Card.Header>
@@ -38,7 +38,7 @@ const TotalForm = ({total, onBayarChange, kembalianValue, bayarValue}) => {
                     <Button variant="success">SIMPAN</Button>
                 </Row>
                 <Row lg={10} className='mt-2'>
-                    <Button variant="danger">Bersihkan Keranjang</Button>
+                    <Button variant="danger" onClick={onCleanClick}>Bersihkan Keranjang</Button>
                 </Row>
                 
             </Card.Body>
