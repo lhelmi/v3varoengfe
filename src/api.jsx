@@ -1,14 +1,17 @@
 import axios from 'axios';
+import { response } from './utils/response';
+
+
 
 const baseurl = import.meta.env.VITE_REACT_APP_API_URL;
 
 export const getProduct = async (param) => {
     try {
         const search = await axios.get(`${baseurl}/api/public/product?params=${param}`);
-        return search.data.data;
+        return response(search.data.data, search.status);
     } catch (error) {
         console.log(error);
-        return null;
+        return response(error.response.data, error.response.status)
     }
 }
 

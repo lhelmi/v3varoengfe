@@ -29,10 +29,10 @@ const App = () => {
 
 
   const bayarHandle = (key) => {
-    setBayar(key);
+    
     key = key ? key : 0;
     let number = rupiahToNumber(key) - total;
-    
+    setBayar(rupiahToNumber(key));
     setKembalian(number);
   }
 
@@ -65,12 +65,16 @@ const App = () => {
   const searchSubmitHandle = async (e) => {
     e.preventDefault();
     let data = await getProduct(search);
-    if(!data){
-      alert('eweh');
+    if(data.statusCode !== 200){
+      Swal.fire({
+        icon: "error",
+        title: "ERROR",
+        text: `${data.data.errors}`,
+      });
       return;
     }
     
-    const temp = isExist(data);
+    const temp = isExist(data.data);
     setCart(temp);
   }
 
@@ -79,7 +83,6 @@ const App = () => {
       return accumulator += item.total;
     }, 0)
     setTotal(totalPrice);
-    console.log(totalPrice);
     setBayar((state) => state ? state : 0);
     setKembalian(bayar-totalPrice);
   }
