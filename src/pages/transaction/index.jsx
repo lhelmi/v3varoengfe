@@ -18,7 +18,8 @@ import {
   decrementQuantity,
   incrementQuantity,
   removeItem,
-  cleanCart
+  cleanCart,
+  setTotal
 } from '../../app/store/cardSlice';
 
 const Transaction = () => {
@@ -29,7 +30,8 @@ const Transaction = () => {
   const total = reduxData.total;
   const dispatch = useDispatch();
   useEffect(() => {
-    updateTotal()
+    updateTotal();
+    dispatch(setTotal());
   }, [
     reduxData
   ]);
