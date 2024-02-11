@@ -1,11 +1,10 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
 import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
 import Swal from 'sweetalert2'
 
-import 'bootstrap/dist/css/bootstrap.min.css';
-
 import { useState, useEffect } from 'react';
-
+import { useSelector, useDispatch } from 'react-redux';
 
 import SearchForm from './components/SearchForm';
 import TotalForm from './components/TotalForm';
@@ -13,24 +12,27 @@ import Items from './components/Items';
 
 import { getProduct } from '../../api';
 import { rupiahToNumber } from '../../utils/format';
-import { useSelector } from 'react-redux';
+
+import {
+  addToCart,
+  decrementQuantity,
+  incrementQuantity,
+  removeItem,
+  cleanCart
+} from '../../app/store/cardSlice';
 
 const Transaction = () => {
-
   const [kembalian, setKembalian] = useState(0);
-  const [total, setTotal] = useState(0);
   const [bayar, setBayar] = useState(0);
-  const [cart, setCart] = useState([]);
   const [search, setSearch] = useState("");
-  
   const reduxData = useSelector((state) => state.cart);
-
+  const total = reduxData.total;
+  const dispatch = useDispatch();
   useEffect(() => {
-    updateTotal(cart);
+    updateTotal()
   }, [
-    cart
+    reduxData
   ]);
-
 
   const bayarHandle = (key) => {
     key = key ? key : 0;
@@ -43,42 +45,18 @@ const Transaction = () => {
     setSearch(value);
   }
 
-  const isExist = (data) => {
-    let Tempcart = cart.slice();
-    let isExist = false;
-    data.qty = 1;
-    data.total = data.purchase_price * data.qty;
-    if(Tempcart.length == 0){
-      Tempcart.push(data);
-      return Tempcart;
-    }
-    
-    Tempcart.map((v, k) => {
-      if(v.barcode == data.barcode){
-        v.qty += 1;
-        v.total = v.purchase_price * v.qty;
-        isExist = true;
-      }
-    });
-    if(!isExist) Tempcart.push(data);
-    
-    return Tempcart;
-  }
-
   const searchSubmitHandle = async (e) => {
     e.preventDefault();
-    let data = await getProduct(search);
-    if(data.statusCode !== 200){
+    let res = await getProduct(search);
+    if(res.statusCode !== 200){
       Swal.fire({
         icon: "error",
         title: "ERROR",
-        text: `${data.data.errors}`,
+        text: `${res.data.errors}`,
       });
       return;
     }
-    
-    const temp = isExist(data.data);
-    setCart(temp);
+    dispatch(addToCart(res.data));
   }
 
   const cleanHandle = () => {
@@ -93,9 +71,7 @@ const Transaction = () => {
       cancelButtonText: "Tidak"
     }).then((result) => {
       if (result.isConfirmed) {
-        let tempCart = cart.slice();
-        tempCart = [];
-        setCart(tempCart);
+        dispatch(cleanCart());
         Swal.fire({
           title: "Terhapus!",
           timer: 1000,
@@ -106,33 +82,20 @@ const Transaction = () => {
     });
   }
 
-  const updateTotal = (arr) => {
-    const totalPrice = arr.reduce((accumulator ,item) => {
-      return accumulator += item.total;
-    }, 0)
-    setTotal(totalPrice);
+  const updateTotal = () => {
     setBayar((state) => state ? state : 0);
-    setKembalian(bayar-totalPrice);
+    setKembalian(bayar-total);
   }
 
-  const minusClickHandle = (key) => {
-    let tempCart = cart.slice();
-    let qty = tempCart[key].qty;
-    if(qty > 1) tempCart[key].qty -= 1;
-    tempCart[key].total = tempCart[key].qty * tempCart[key].purchase_price;
-    
-    setCart(tempCart);
+  const minusClickHandle = (id) => {
+    dispatch(decrementQuantity(id));
   }
 
-  const plusClickHandle = (key) => {
-    let tempCart = cart.slice();
-    tempCart[key].qty += 1;
-    tempCart[key].total = tempCart[key].qty * tempCart[key].purchase_price;
-    
-    setCart(tempCart);
+  const plusClickHandle = (id) => {
+    dispatch(incrementQuantity(id));
   }
 
-  const deleteItemHandle = (key) => {
+  const deleteItemHandle = (id) => {
     Swal.fire({
       title: "Apakah Anda Yakin?",
       icon: "warning",
@@ -143,34 +106,30 @@ const Transaction = () => {
       cancelButtonText: "Tidak"
     }).then((result) => {
       if (result.isConfirmed) {
-        let tempCart = cart.slice();
-        const index = tempCart[key];
-        if (index) {
-          tempCart.splice(key, 1);
-          setCart(tempCart);
-          Swal.fire({
-            title: "Terhapus!",
-            timer: 1000,
-            icon: "success"
-          });
-        }
+        dispatch(removeItem(id));
+        Swal.fire({
+          title: "Terhapus!",
+          timer: 1000,
+          icon: "success"
+        });
+        
       }
     });
   }
 
   const ShowCart = () => {
-    return cart.map((cart, i) => {
+    return reduxData.item.map((cart, i) => {
       return (
         <Items
           key={i}
           barcode={cart.barcode}
           name={cart.name}
-          qty={cart.qty}
-          purchase_price={cart.purchase_price} 
+          qty={cart.quantity}
+          price={cart.price} 
           total={cart.total}
-          minusClick={() => minusClickHandle(i)}
-          plusClick={() => plusClickHandle(i)}
-          deleteItem={() => deleteItemHandle(i)}
+          minusClick={() => minusClickHandle(cart.id)}
+          plusClick={() => plusClickHandle(cart.id)}
+          deleteItem={() => deleteItemHandle(cart.id)}
         />
       );
     });
@@ -178,9 +137,7 @@ const Transaction = () => {
 
   return (
     <>
-    
       <Container>
-      
         <Col xs={12}>
           <ShowCart />
           <SearchForm
@@ -196,9 +153,7 @@ const Transaction = () => {
           />
         </Col>
       </Container>
-      
     </>
   )
 }
-
 export default Transaction

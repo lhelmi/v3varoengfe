@@ -7,7 +7,7 @@ import { Trash } from 'react-bootstrap-icons';
 import { formatRupiah } from '../../../utils/format';
 
 
-const Items = ({name, barcode, qty, purchase_price, total, minusClick, plusClick, deleteItem}) => {
+const Items = ({name, barcode, qty, price, total, minusClick, plusClick, deleteItem}) => {
     return (
         <Card className='mt-3'>
             <Card.Header>
@@ -47,7 +47,7 @@ const Items = ({name, barcode, qty, purchase_price, total, minusClick, plusClick
                         </div>
                     </Col>
                     <Col lg={6} xs={5}>
-                        <Form.Control className="" disabled readOnly value={formatRupiah(purchase_price)}/>
+                        <Form.Control className="" disabled readOnly value={formatRupiah(price)}/>
                     </Col>
                 </Row>
                 <Row className="mt-2">
