@@ -4,8 +4,8 @@ import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Trash } from 'react-bootstrap-icons';
+import { formatRupiah } from '../../../utils/format';
 
-import { formatRupiah } from '../utils/format';
 
 const Items = ({name, barcode, qty, purchase_price, total, minusClick, plusClick, deleteItem}) => {
     return (
