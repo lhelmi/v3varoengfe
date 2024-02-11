@@ -10,17 +10,11 @@ const Logout = () => {
     const authData = useSelector((state) => state.auth);
 
     useEffect(() => {
-        console.log(authData.isLogin);
         if(authData.isLogin){
             dispatch(logout());
         }
         navigate('/auth/login');
     }, []);
-    
-    return (
-        <>
-        </>
-    )
 }
 
 export default Logout;
