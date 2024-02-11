@@ -49,6 +49,8 @@ export const cartSlice = createSlice({
         removeItem: (state, action) => {
             const filterCart = state.item.filter((value) => value.id !== action.payload);
             state.item = filterCart;
+            state.totalItem = state.item.reduce((accumulator, v) => accumulator + v.quantity, 0);
+            state.total = state.item.reduce((accumulator, v) => accumulator + v.total, 0);
         },
         cleanCart: (state, action) => {
             state.item = [];
