@@ -51,10 +51,10 @@ export const createProduct = async (param) => {
     }
 }
 
-export const findProduct = async (token, query) => {
+export const findProduct = async ({q, token, page, limit}) => {
     try {
         const res = await axios.get(
-            `${baseurl}/api/product/list?params=${query}`, {
+            `${baseurl}/api/product/list?q=${q}&page=${page}&limit=${limit}`, {
                 headers: header(token)
             }
         );

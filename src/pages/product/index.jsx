@@ -15,6 +15,8 @@ const Product = () => {
     const [ products, setProducts ] = useState([]);
     const authData = useSelector((state) => state.auth);
     const token = authData.data.token;
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(0);
 
     useEffect(() => {
         
@@ -30,7 +32,13 @@ const Product = () => {
 
     const searchHandle = async (e) => {
         e.preventDefault();
-        const res = await findProduct(token, search);
+        const param = {
+            token : token,
+            limit : limit,
+            page : page,
+            q : search
+        }
+        const res = await findProduct(param);
         if(res.statusCode !== 200){
             Swal.fire({
                 icon: "error",
