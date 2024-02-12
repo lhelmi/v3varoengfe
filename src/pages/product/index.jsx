@@ -54,6 +54,7 @@ const Product = () => {
                     name = {v.name}
                     price = {v.price}
                     purchase_price = {v.purchase_price}
+                    number = {k+1}
                 />
             );
         });
