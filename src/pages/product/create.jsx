@@ -39,7 +39,6 @@ const ProductCreate = () => {
         });
 
     }
-
     
     return (
         <>

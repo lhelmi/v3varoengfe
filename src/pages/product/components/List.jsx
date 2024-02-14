@@ -1,6 +1,10 @@
-const ProductList = ({barcode, name, price, purchase_price, number}) => {
+import { Card } from "react-bootstrap";
+
+const ProductList = ({barcode, name, price, purchase_price, number, showModal}) => {
+    
     return (
-        <div className="card mt-2">
+        <>
+        <Card onClick={showModal} className="mt-2">
             <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                 {number}
             </span>
@@ -26,7 +30,10 @@ const ProductList = ({barcode, name, price, purchase_price, number}) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </Card>
+
+        
+        </>
     );
 }
 

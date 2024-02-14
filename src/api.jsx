@@ -51,15 +51,33 @@ export const createProduct = async (param) => {
     }
 }
 
-export const findProduct = async ({q, token, page, limit}) => {
+export const findProduct = async ({q, token, page, size}) => {
     try {
         const res = await axios.get(
-            `${baseurl}/api/product/list?q=${q}&page=${page}&limit=${limit}`, {
+            `${baseurl}/api/product/list?q=${q}&page=${page}&size=${size}`, {
                 headers: header(token)
             }
         );
+        return response(res.data, res.status);
+    } catch (error) {
+        return response(error.response.data, error.response.status);
+    }
+}
+
+export const updateProduct = async (id, param) => {
+    try {
+        const token = param.token
+        delete param.token;
+        
+        const res = await axios.put(
+            `${baseurl}/api/products/${id}`, param, {
+                headers: header(token)
+            }
+        );
+        console.log(res);
         return response(res.data.data, res.status);
     } catch (error) {
+        console.log(error)
         return response(error.response.data, error.response.status);
     }
 }

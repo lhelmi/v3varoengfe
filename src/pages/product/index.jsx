@@ -1,60 +1,74 @@
 
-import { Container, Col, Button } from "react-bootstrap";
+import { Container, Col, Button, Row } from "react-bootstrap";
 import SearchProduct from "./components/searchProduct";
 import { useNavigate } from "react-router-dom";
-import EditForm from "./components/EditForm";
 import { useEffect, useState } from "react";
-import { findProduct } from "../../api";
-import { useSelector } from 'react-redux';
+import { updateProduct, findProduct } from "../../api";
+import { useSelector, useDispatch } from 'react-redux';
 import ProductList from "./components/List";
+import Swal from 'sweetalert2'
+import ModalEditProduct from "./components/modal";
+import {
+    setSearch, setPage, setSize, setShow, setProducts, setProductCount,
+    setModalBarcode, setModalName, setModalPurchase, setModalPrice, setModalId, setErrors,
+    setIsload
+} from "../../app/store/productSlice";
+import ProductPagination from "./components/pagging";
 
 const Product = () => {
-    const navigate = useNavigate();
-    const [ barcode, setBarcode ] = useState('');
-    const [ search, setSearch ] = useState('');
-    const [ products, setProducts ] = useState([]);
     const authData = useSelector((state) => state.auth);
+    const productData = useSelector((state) => state.product);
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    
     const token = authData.data.token;
-    const [page, setPage] = useState(1);
-    const [limit, setLimit] = useState(0);
+    const handleClose = () => dispatch(setShow());
 
     useEffect(() => {
-        
-    }, [products])
-
-    const changeBarcode = (key) => {
-        setBarcode(key);
-    }
+        // if(productData.page !== 1){
+        //     console.log(productData.page)
+        //     searchAction()
+        // }
+    }, [productData.page])
 
     const searchChangeHandle = (value) => {
-        setSearch(value);
-      }
+        dispatch(setSearch(value));
+    }
+
+    const showModal = ({barcode, name, price, purchase_price, id}) => {
+        dispatch(setModalBarcode(barcode));
+        dispatch(setModalName(name));
+        dispatch(setModalPrice(price));
+        dispatch(setModalPurchase(purchase_price));
+        dispatch(setModalId(id));
+        dispatch(setShow());
+    }
 
     const searchHandle = async (e) => {
         e.preventDefault();
-        const param = {
-            token : token,
-            limit : limit,
-            page : page,
-            q : search
-        }
-        const res = await findProduct(param);
-        if(res.statusCode !== 200){
-            Swal.fire({
-                icon: "error",
-                title: "ERROR",
-                text: `${res.data.errors}`,
-            });
-            return;
-        }
-        let productTemp = products.slice();
-        productTemp = res.data;
-        
-        setProducts(productTemp);
+        await searchAction();
+        return;
+    }
+
+    const changeBarcodeHandle = (key) => {
+        dispatch(setModalBarcode(key))
+    }
+
+    const changeNameHandle = (key) => {
+        dispatch(setModalName(key))
+    }
+
+    const changePriceHandle = (key) => {
+        dispatch(setModalPrice(key))
+    }
+
+    const changePurchaseHandle = (key) => {
+        dispatch(setModalPurchase(key))
     }
 
     const ShowProducts = () => {
-        return products.map((v, k) => {
+        return productData.products.map((v, k) => {
             return (
                 <ProductList
                     key={k}
@@ -63,9 +77,67 @@ const Product = () => {
                     price = {v.price}
                     purchase_price = {v.purchase_price}
                     number = {k+1}
+                    showModal= {() => showModal(v)}
                 />
             );
         });
+    }
+
+    const updateFormHandle = async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        const formJson = Object.fromEntries(formData.entries());
+        const param = {
+            barcode : formJson.barcode,
+            name : formJson.name,
+            price : parseInt(formJson.price),
+            purchase_price : parseInt(formJson.purchase_price),
+            token : token
+        }
+        
+        const res = await updateProduct(productData.modalId, param);
+        if(res.statusCode == 400) {
+            dispatch(setErrors(res.data.errors));
+            return;
+        }
+        
+        dispatch(setErrors({}));
+        await searchAction();
+        dispatch(setShow());
+        Swal.fire({
+            icon: "success",
+            text: `Data berhasil di simpan`,
+        });
+        return;
+    }
+
+    const searchAction = async (page) => {
+        const param = {
+            token : token,
+            size : productData.size,
+            page : page ? page : productData.page,
+            q : productData.search
+        }
+        const res = await findProduct(param);
+        
+        dispatch(setIsload(res.data.length < 10 ? false : true));
+        if(res.statusCode !== 200){
+            Swal.fire({
+                icon: "error",
+                title: "ERROR",
+                text: `${res.data.errors}`,
+            });
+            return;
+        }
+        dispatch(setProducts(res.data.data));
+        dispatch(setProductCount(res.data.count));
+        
+    }
+
+    const changePageHandle = async (page) => {
+        dispatch(setPage(page));
+        await searchAction(page);
     }
 
     return (
@@ -81,6 +153,26 @@ const Product = () => {
                 />
                 
                 <ShowProducts/>
+                <ProductPagination
+                    currentPage={productData.page}
+                    dataPerPage={productData.size}
+                    totalData={productData.productCount.data}
+                    changePage={changePageHandle}
+                />
+                <ModalEditProduct
+                    handleClose = {() => handleClose()}
+                    show={productData.show}
+                    changeBarcode={({target}) => changeBarcodeHandle(target.value)}
+                    changeName={({target}) => changeNameHandle(target.value)}
+                    changePrice={({target}) => changePriceHandle(target.value)}
+                    changePurchase={({target}) => changePurchaseHandle(target.value)}
+                    barcode={productData.modalBarcode}
+                    name={productData.modalName}
+                    price={productData.modalPrice}
+                    purchase_price={productData.modalPurchase}
+                    formOnUpdate = {updateFormHandle}
+                    errors={productData.errors}
+                />
                 
             </Col>
         </Container>
