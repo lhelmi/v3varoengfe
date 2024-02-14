@@ -1,10 +1,12 @@
 import Pagination from 'react-bootstrap/Pagination';
 
 const ProductPagination = ({currentPage, totalData, dataPerPage, changePage}) => {
-    const totalPage = Math.ceil(totalData/dataPerPage);
+    const totalPage = Math.ceil((totalData ? totalData : 1)/dataPerPage);
+    
+    const lengthPagging = 2;
     const NextPage = () => {
         let i = 1;
-        return Array(3).fill([]).map((v, k) => {
+        return Array(lengthPagging).fill([]).map((v, k) => {
             let number = currentPage+i;
             if(number < totalPage){
                 i++;
@@ -18,10 +20,10 @@ const ProductPagination = ({currentPage, totalData, dataPerPage, changePage}) =>
     const PrevPage = () => {
         let prev = currentPage;
         let i = 0;
-        return Array(3).fill([]).map((v, k) => {
-            let number = prev-3+i;
+        return Array(lengthPagging).fill([]).map((v, k) => {
+            let number = prev-1+i;
             i++;
-            if(number > 1){
+            if(number > 1 && number < totalPage){
                 return (
                     <Pagination.Item key={k} onClick={() => changePage(number)}>{number}</Pagination.Item>
                 );

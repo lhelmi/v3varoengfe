@@ -155,6 +155,7 @@ const Product = () => {
                 />
                 
                 <ShowProducts/>
+                
                 <ProductPagination
                     currentPage={productData.page}
                     dataPerPage={productData.size}
