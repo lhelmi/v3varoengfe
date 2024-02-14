@@ -11,7 +11,7 @@ import ModalEditProduct from "./components/modal";
 import {
     setSearch, setPage, setSize, setShow, setProducts, setProductCount,
     setModalBarcode, setModalName, setModalPurchase, setModalPrice, setModalId, setErrors,
-    setIsload
+    setIsload, setPrevSearch
 } from "../../app/store/productSlice";
 import ProductPagination from "./components/pagging";
 
@@ -26,10 +26,7 @@ const Product = () => {
     const handleClose = () => dispatch(setShow());
 
     useEffect(() => {
-        // if(productData.page !== 1){
-        //     console.log(productData.page)
-        //     searchAction()
-        // }
+        
     }, [productData.page])
 
     const searchChangeHandle = (value) => {
@@ -113,6 +110,10 @@ const Product = () => {
     }
 
     const searchAction = async (page) => {
+        if(productData.search !== productData.prevSearch){
+            page = 1;
+            dispatch(setPage(1));
+        }
         const param = {
             token : token,
             size : productData.size,
@@ -122,6 +123,7 @@ const Product = () => {
         const res = await findProduct(param);
         
         dispatch(setIsload(res.data.length < 10 ? false : true));
+        dispatch(setPrevSearch(productData.search));
         if(res.statusCode !== 200){
             Swal.fire({
                 icon: "error",

@@ -13,7 +13,8 @@ const initialState = {
     modalId : '',
     isLoad : false,
     errors:{},
-    productCount : 0
+    productCount : 0,
+    prevSearch : ''
 }
 
 export const productSlice = createSlice({
@@ -22,6 +23,9 @@ export const productSlice = createSlice({
     reducers: {
         setSearch: (state, action) => {
             state.search = action.payload;
+        },
+        setPrevSearch: (state, action) => {
+            state.prevSearch = action.payload;
         },
         setPage: (state, action) => {
             state.page = action.payload
@@ -68,6 +72,6 @@ export const productSlice = createSlice({
 export const {
     setSearch, setPage, setSize, setShow, setProducts, setProductCount,
     setModalBarcode, setModalName, setModalPurchase, setModalPrice, setModalId,
-    setErrors, setIsload
+    setErrors, setIsload, setPrevSearch
 } = productSlice.actions;
 export default productSlice.reducer;
