@@ -12,6 +12,7 @@ import Items from './components/Items';
 
 import { getProduct } from '../../api';
 import { rupiahToNumber } from '../../utils/format';
+import ModalProductList from './components/modal';
 
 import {
   addToCart,
@@ -19,8 +20,11 @@ import {
   incrementQuantity,
   removeItem,
   cleanCart,
-  setTotal
+  setTotal,
+  setShow,
+  setDataModal
 } from '../../app/store/cardSlice';
+
 
 const Transaction = () => {
   const [kembalian, setKembalian] = useState(0);
@@ -58,7 +62,13 @@ const Transaction = () => {
       });
       return;
     }
-    dispatch(addToCart(res.data));
+    
+    if(res.data.length > 1){
+      dispatch(setDataModal(res.data));
+      dispatch(setShow(true));
+      return;
+    }
+    dispatch(addToCart(res.data[0]));
   }
 
   const cleanHandle = () => {
@@ -119,6 +129,8 @@ const Transaction = () => {
     });
   }
 
+  const handleClose = () => dispatch(setShow(false));
+
   const ShowCart = () => {
     return reduxData.item.map((cart, i) => {
       return (
@@ -137,6 +149,8 @@ const Transaction = () => {
     });
   }
 
+  
+
   return (
     <>
       <Container>
@@ -152,6 +166,11 @@ const Transaction = () => {
             kembalianValue={kembalian}
             bayarValue={bayar}
             onCleanClick={() => cleanHandle()}
+          />
+          <ModalProductList
+            handleClose={handleClose}
+            data={reduxData.dataModal}
+            show={reduxData.show}
           />
         </Col>
       </Container>
